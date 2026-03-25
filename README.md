@@ -120,7 +120,7 @@ Unusual Whales Scanner
 ---
 
 ## Backtest Results (Databento OPRA.PILLAR)
-![GEX Zone Analysis](assets/gex_zone_analysis.png)
+![GEX Zone Analysis](asset/gex_zone_analysis.png)
 Backtested against real tick-level data from Databento's OPRA.PILLAR dataset (~$3.25 for 79-signal backtest).
 
 ### Phase 2: Raw Results (All Zones, No Filtering)
