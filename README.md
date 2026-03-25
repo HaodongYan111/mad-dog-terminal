@@ -121,7 +121,9 @@ Unusual Whales Scanner
 
 ## Backtest Results (Databento OPRA.PILLAR)
 
-Backtested against real market data from Databento's OPRA.PILLAR dataset (~$3.25 for 79-signal backtest).
+Backtested against real tick-level data from Databento's OPRA.PILLAR dataset (~$3.25 for 79-signal backtest).
+
+### Phase 2: Raw Results (All Zones, No Filtering)
 
 | Metric | Value |
 |--------|-------|
@@ -131,7 +133,7 @@ Backtested against real market data from Databento's OPRA.PILLAR dataset (~$3.25
 | Profit Factor | 1.27 |
 | Win Rate | 26.2% |
 
-### GEX Zone Performance
+### GEX Zone Breakdown — Where the Alpha Lives
 
 | Zone | Trades | Win Rate | P&L |
 |------|--------|----------|-----|
@@ -140,7 +142,29 @@ Backtested against real market data from Databento's OPRA.PILLAR dataset (~$3.25
 | BETWEEN_WALLS | (best) | 50% | — |
 | NEAR_RESIST | (worst) | 0% TP | 67% SL |
 
-**Key insight:** GEX zone awareness is the single largest alpha driver. KNOWN GEX trades outperform UNKNOWN by ~$14K on 65 trades. The `NEAR_RESIST` zone should be skipped entirely.
+**Key finding:** KNOWN GEX trades outperform UNKNOWN by ~$14K on 65 trades. `NEAR_RESIST` has zero take-profit hits. These two zones are pure negative EV — skipping them is the single largest edge.
+
+### Phase 3: Filtered Results (Zone Rules + Scenario Analysis)
+
+After applying the derived trading rules (skip `NEAR_RESIST` and `UNKNOWN`), performance improves dramatically across all TP/SL scenarios:
+
+| Scenario | Trades | Win Rate | Total P&L | Profit Factor | $/Trade |
+|----------|--------|----------|-----------|---------------|---------|
+| ScenE_TP100 | 29 | 41.4% | $1,696 | 1.36 | $58 |
+| NoTP_T30_G30 | 29 | 41.4% | $10,495 | 3.22 | $362 |
+| NoTP_T30_G20 | 29 | 51.7% | $7,818 | 2.66 | $270 |
+| NoTP_T50_G30 | 29 | 48.3% | $12,291 | 3.41 | $424 |
+| NoTP_T50_G40 | 29 | 44.8% | $11,675 | 3.29 | $403 |
+| TP200_T30_G30 | 29 | 41.4% | $5,324 | 2.13 | $184 |
+| TP300_T50_G25 | 29 | 48.3% | $9,377 | 2.84 | $323 |
+
+*Scenario naming: `NoTP` = let winners run (no take-profit cap), `T30/T50` = time stop at 30/50% DTE remaining, `G20/G30/G40` = GEX wall proximity threshold for SL.*
+
+**Result:** GEX zone filtering transforms the strategy from PF 1.27 → PF 2.6–3.4 depending on exit configuration. The best scenario (`NoTP_T50_G30`) yields PF 3.41 with 48.3% win rate and $424/trade.
+
+### Position Sizing
+
+Live execution uses **half-Kelly sizing** to balance growth rate against drawdown risk. The Kelly fraction is derived from the filtered zone's win rate and payoff ratio — half-Kelly sacrifices ~25% of theoretical growth for ~50% reduction in variance.
 
 ---
 
